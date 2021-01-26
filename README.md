@@ -1,4 +1,4 @@
-# Based-Tic-Tac-Toe-without-minimax
+# Based-Tic-Tac-Toe-without-minimax.
 Tic Tac Toe made in pure JavaScript.
 The robot works that way, making decisions based on the following priorities (from the most till the least important):
 
