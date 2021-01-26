@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<script>
+
+table=document.createElement("div")
+document.body.appendChild(table)
+for(let x=0; x<9; x++)
+    {
+    if(x%3==0)
+        {
+        tr=document.createElement("tr") 
+        document.body.appendChild(tr)
+        }
+    td=document.createElement("td")
+    td.innerHTML="□"
+    td.style.fontSize="900%"
+    td.onclick=function(){play(x)}
+    tr.appendChild(td)
+    }
+
+newgame=document.createElement("button")
+newgame.innerHTML="New Game"
+document.body.append(newgame)
+newgame.onclick=function()
+    {
+    for(let z=0; z<3; z++)
+            {
+            for(let y=0; y<3; y++)
+                {
+                document.body.children[2+z].children[y].innerHTML="□"
+                document.body.children[2+z].children[y].style.fontSize="900%"
+                }
+            }
+    game.gameover=false
+    game.houses=[-1,-1,-1,-1,-1,-1,-1,-1,-1]
+    }
+
+game= 
+    {
+    turn: 0,
+    houses: [-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    combinations: [[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6],[0,3,6],[1,4,7],[2,5,8]],
+    gameover: false
+    }
+
+robot=
+    {
+    threedots: function(){robot.check(2,1); return threedots_},
+    middleboard: function(){if(game.houses[4]==-1) return true},
+    block: function(){robot.check(2,0); return block_},
+    harm: function(){robot.check(1,0); return harm_},
+    anywhere: function()
+            {
+            let empty=[]
+            for(let x=0; x<9; x++)
+                {
+                if(game.houses[x]==-1)
+                    {
+                    empty.push(x)
+                    }
+                }
+            return empty.length==0?undefined:empty
+            },
+    check: function(n,p)
+        {
+        harm_=[]
+	block_=[]
+	threedots_=[]
+        output=undefined
+        for(let x=0; x<8; x++)
+            {
+            dots=[];
+            positions=[];
+            p0=0;
+            p1=0
+            for(let z=0; z<3; z++)
+                {
+                dots.push(game.houses[game.combinations[x][z]])
+                positions.push(game.combinations[x][z])
+                if(game.houses[game.combinations[x][z]]==0)
+                    {
+                    p0++
+                    }
+                if(game.houses[game.combinations[x][z]]==1)
+                    {
+                    p1++
+                    }
+                }
+                if(n==1 && !dots.includes(0) && p1==n)
+                    {
+                    positions.filter((x,index)=>dots[index]==-1).forEach((x)=>harm_.push(x))
+                    }
+                if(n==2)
+                    {
+                    if(p==0)
+                        {
+                        if(p0==n && dots.includes(0))
+                            {
+                            block_.push(positions[dots.indexOf(-1)])
+                            }
+                        }
+                        else
+                            {
+                            if(p1==n && !dots.includes(0))
+                                {
+                                threedots_.push(positions[dots.indexOf(-1)])
+                                }
+                            }
+                    }
+                 }
+    if(harm_.length==0) harm_=undefined
+	if(block_.filter(x=>x!==undefined).length==0) block_=undefined
+	if(threedots_.filter(x=>x!==undefined).length==0) 
+		{
+		threedots_=undefined
+		}
+		else
+			{
+			game.gameover=true
+			}
+        }       
+    }
+
+function play(house)
+    {
+    if(game.turn==0)
+        {
+        if(game.houses[house]==-1 && game.gameover==false)
+            {
+            if(robot.block()!==undefined && robot.block().includes(house))
+                {
+                game.gameover=true
+                }
+            document.body.children[2+(house-house%3)/3].children[house%3].innerHTML="⛝"
+            game.houses[house]=0
+            document.body.children[2+(house-house%3)/3].children[house%3].style.fontSize="500%"
+            if(game.gameover==false)
+                {
+                robot.threedots()==undefined?
+                    robot.middleboard()==undefined?
+                        robot.block()==undefined?
+                            robot.harm()==undefined?
+                                robot.anywhere()==undefined?
+                                    game.gameover=true
+                                    :
+                                    (function()
+                                        {
+                                        output__=[]
+                                        for(let y=0; y<robot.anywhere().length; y++)
+                                            {
+                                            if(robot.anywhere()[y]%2==0)
+                                                {
+                                                output__.push(robot.anywhere()[y])
+                                                }
+                                            }
+                                        if(output__.length==0)
+                                            {
+                                            robot_(robot.anywhere()[Math.floor((Math.random()*robot.anywhere().length+1)-1)])
+                                            }
+                                            else
+                                                {
+                                                robot_(output__[Math.floor((Math.random()*output__.length+1)-1)])    
+                                                }
+                                        })()
+                                :
+                                (function()
+                                    {
+                                    //SE TEM SÓ DOIS 1 NO GAME.SQUARES
+                                    //SE O DISTANCE DELES É 4
+
+                                    if
+                                        (
+                                            (function()
+                                            {
+                                            let z=[]
+                                            for(let x=0; x<9; x++)
+                                                {
+                                                if(game.houses[x]==0)
+                                                    {
+                                                    z.push(x)
+                                                    }
+                                                }
+                                            if(z.length==2 && distance(z[0],z[1])==4) return true
+                                            }
+                                            )()
+                                        ==true
+                                        )
+                                        {
+                                        return robot_(robot.harm().filter(x=>x%2!==0)[Math.floor((Math.random()*robot.harm().filter(x=>x%2!==0).length+1)-1)])
+                                        }
+                                    externals=robot.harm().filter(x=>x%2==0)
+                                    distances=[]
+                                    for(let y=0; y<externals.length; y++)
+                                        {
+                                        distances.push(0)
+                                        for(let z=0; z<9; z++)
+                                            {
+                                            if(game.houses[z]==0)
+                                                {
+                                                console.log("externals[y]="+externals[y]+"  ;"+"z="+z+"        y="+y)
+                                                distances[y]+=distance(externals[y],z)
+                                                }
+                                            }
+                                        }
+                                        if(externals.length==0)
+                                            {console.log(321)
+                                            robot_(robot.harm()[Math.floor((Math.random()*robot.harm().length+1)-1)])
+                                            return
+                                            }
+                                        if(externals.length!==0)
+                                            {
+                                            a=distances[0]
+                                            b=0
+                                            for(let x=0; x<externals.length; x++)
+                                                {
+                                                if(distances[x]<a) a=distances[x],b=x
+                                                }
+                                            robot_(externals[b])  
+                                            }
+                                    function distance(a,b)
+                                        {
+                                        references=[[0,1,2],[3,4,5],[6,7,8]]
+                                        for(let x=0; x<3; x++)
+                                            {
+                                            if(references[x].includes(a)) arow=x
+                                            if(references[x].includes(b)) brow=x
+                                            }
+                                        return Math.abs(arow-brow)+Math.abs(a%3-b%3)
+                                        }
+                                    })()
+                            :
+                    (function()
+                        {
+                        robot_(robot.block().filter(x=>x!==undefined)[0])
+                        })()
+                        :
+                        robot_(4)
+                    :
+                    robot_(robot.threedots()[Math.floor((Math.random()*robot.threedots().length+1)-1)])
+                function robot_(house_)
+                    {
+                    document.body.children[2+(house_-house_%3)/3].children[house_%3].innerHTML="⧇"
+                    game.houses[house_]=1;
+                    document.body.children[2+(house_-house_%3)/3].children[house_%3].style.fontSize="720%"
+                    }
+                }
+            }
+        }
+    }
+</script>
+</body>
+</html>
